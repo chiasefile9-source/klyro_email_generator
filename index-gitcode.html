@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Công Cụ Tạo Thẻ Mã Giảm Giá | Klyro Slide Design</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- html2canvas CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            klyro: {
+              purple: '#7C3AED',
+              pink: '#EC4899',
+              blue: '#2563EB',
+              dark: '#0B0F17',
+              card: '#131927',
+              border: '#1E293B'
+            }
+          },
+          keyframes: {
+            shimmer: {
+              '100%': { transform: 'translateX(100%)' }
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: '0.4' },
+              '50%': { opacity: '0.8' }
+            }
+          },
+          animation: {
+            shimmer: 'shimmer 2.5s infinite',
+            float: 'float 4s ease-in-out infinite',
+            pulseGlow: 'pulseGlow 3s infinite'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Voucher Perforated Circles & Edge Styling */
+    .ticket-container {
+      position: relative;
+    }
+    
+    .ticket-notch-left, .ticket-notch-right {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background-color: #0F172A; /* Slate-900 bg match */
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 20;
+    }
+    .ticket-notch-left { left: -12px; }
+    .ticket-notch-right { right: -12px; }
+
+    /* Perforated dashed divider line */
+    .dashed-divider {
+      border-left: 2px dashed rgba(255, 255, 255, 0.3);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0F17;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    /* Shimmer effect overlay */
+    .shimmer-effect::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        60deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 70%
+      );
+      transform: rotate(30deg) translateX(-100%);
+      animation: shimmer 4s infinite;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body class="h-full font-sans antialiased bg-slate-950 text-slate-100 flex flex-col min-h-screen">
+
+  <!-- Header / Navigation Banner -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="https://ww.klyro.gt.tc/index-main.html" target="_blank" class="flex items-center space-x-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-0.5 shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300">
+            <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+              <i class="fa-solid fa-wand-magic-sparkles text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 text-lg"></i>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-extrabold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-purple-300">KLYRO</span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-semibold">Voucher Studio</span>
+            </div>
+            <p class="text-xs text-slate-400 hidden sm:block">Công cụ tạo thẻ quà tặng & mã giảm giá chuyên nghiệp</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <a href="https://ww.klyro.gt.tc/index-main.html" target="_blank" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2">
+          <i class="fa-solid fa-arrow-up-right-from-square text-purple-400"></i>
+          <span>Trang chủ Klyro</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex flex-col">
+    
+    <!-- Title Section -->
+    <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-white flex items-center gap-2">
+          <span>Tạo Mã Giảm Giá Klyro</span>
+          <i class="fa-solid fa-ticket text-purple-400 text-xl"></i>
+        </h1>
+        <p class="text-slate-400 text-sm mt-1">Tùy chỉnh thông số, xem trước trực quan real-time và xuất ảnh PNG hoặc code HTML nhúng nhanh chóng.</p>
+      </div>
+
+      <!-- Actions fast status -->
+      <div class="flex items-center gap-2 text-xs text-slate-400 bg-slate-900 px-3 py-2 rounded-lg border border-slate-800">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Hệ thống tạo thẻ đang sẵn sàng</span>
+      </div>
+    </div>
+
+    <!-- Main Workspace (Grid 2 columns on desktop) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start flex-1">
+      
+      <!-- LEFT COLUMN: Customization Controls (Lg: col-span-5) -->
+      <div class="lg:col-span-5 space-y-5 bg-slate-900/90 backdrop-blur-sm p-5 md:p-6 rounded-2xl border border-slate-800 shadow-xl">
+        
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-purple-400"></i>
+            Bảng Điều Khiển Tùy Chỉnh
+          </h2>
+          <button id="btn-reset-form" type="button" class="text-xs text-slate-400 hover:text-slate-200 transition flex items-center gap-1">
+            <i class="fa-solid fa-rotate-left"></i> Đặt lại
+          </button>
+        </div>
+
+        <form id="voucher-form" class="space-y-4" onsubmit="event.preventDefault();">
+          
+          <!-- 1. Giftcode Input & Auto Generate Button -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              Mã Giftcode / Voucher <span class="text-rose-400">*</span>
+            </label>
+            <div class="flex gap-2">
+              <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <i class="fa-solid fa-barcode"></i>
+                </div>
+                <input type="text" id="input-code" value="KLYRO50K" uppercase class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 font-mono font-bold text-sm tracking-wider uppercase focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition" placeholder="VD: KLYRO50K">
+              </div>
+              <button type="button" id="btn-random-code" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 font-semibold text-xs rounded-xl border border-slate-700 transition flex items-center gap-1.5 whitespace-nowrap active:scale-95">
+                <i class="fa-solid fa-dice text-purple-400"></i>
+                <span>Mã Ngẫu Nhất</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Discount Type & Value -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Loại giảm giá</label>
+              <select id="select-type" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-slate-200 text-xs font-medium focus:outline-none focus:border-purple-500 transition">
+                <option value="fixed">Số tiền cố định (VNĐ)</option>
+                <option value="percent">Phần trăm (%)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Giá trị giảm</label>
+              <input type="text" id="input-value" value="50.000" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 text-xs font-semibold focus:outline-none focus:border-purple-500 transition" placeholder="50.000 hoặc 20">
+            </div>
+          </div>
+
+          <!-- 3. Condition / Min Spend -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Đơn tối thiểu / Điều kiện áp dụng</label>
+            <input type="text" id="input-condition" value="Áp dụng cho đơn thiết kế slide từ 200.000đ" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-500 transition" placeholder="VD: Đơn từ 100k hoặc Gói Slide Pro">
+          </div>
+
+          <!-- 4. Expiry Date & Usage Limit Badge -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Hạn sử dụng</label>
+              <input type="text" id="input-expiry" value="30/12/2026" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-500 transition" placeholder="31/12/2026">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Số lượt tối đa</label>
+              <input type="text" id="input-limit" value="Chỉ 20 lượt đầu" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-500 transition" placeholder="VD: Chỉ 10 lượt">
+            </div>
+          </div>
+
+          <!-- 5. Note / Description -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Ghi chú / Mô tả ngắn</label>
+            <textarea id="input-note" rows="2" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-slate-200 text-xs focus:outline-none focus:border-purple-500 transition resize-none" placeholder="Nhập ghi chú cho khách hàng...">Áp dụng khi đặt thiết kế PPT/Google Slides tại Klyro Website.</textarea>
+          </div>
+
+          <!-- 6. Interface & Theme Selectors -->
+          <div class="pt-2 border-t border-slate-800 space-y-3">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Tùy Chọn Phối Màu Thẻ (Theme)</label>
+            
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <!-- Preset 1: Klyro Purple Blue -->
+              <label class="cursor-pointer border border-slate-700 rounded-xl p-2.5 flex items-center space-x-2.5 bg-slate-950 hover:border-purple-500 transition has-[:checked]:border-purple-500 has-[:checked]:bg-purple-950/20">
+                <input type="radio" name="theme-preset" value="klyro" checked class="text-purple-600 focus:ring-purple-500">
+                <div class="w-5 h-5 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 shrink-0"></div>
+                <span class="font-medium text-slate-200 text-[11px]">Klyro Tím Mộng</span>
+              </label>
+
+              <!-- Preset 2: Cam Hoàng Hôn -->
+              <label class="cursor-pointer border border-slate-700 rounded-xl p-2.5 flex items-center space-x-2.5 bg-slate-950 hover:border-amber-500 transition has-[:checked]:border-amber-500 has-[:checked]:bg-amber-950/20">
+                <input type="radio" name="theme-preset" value="sunset" class="text-amber-600 focus:ring-amber-500">
+                <div class="w-5 h-5 rounded-full bg-gradient-to-r from-amber-500 via-orange-600 to-rose-600 shrink-0"></div>
+                <span class="font-medium text-slate-200 text-[11px]">Cam Hoàng Hôn</span>
+              </label>
+
+              <!-- Preset 3: Xanh Ngọc Lục Bảo -->
+              <label class="cursor-pointer border border-slate-700 rounded-xl p-2.5 flex items-center space-x-2.5 bg-slate-950 hover:border-emerald-500 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/20">
+                <input type="radio" name="theme-preset" value="emerald" class="text-emerald-600 focus:ring-emerald-500">
+                <div class="w-5 h-5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-500 shrink-0"></div>
+                <span class="font-medium text-slate-200 text-[11px]">Ngọc Lục Bảo</span>
+              </label>
+
+              <!-- Preset 4: Đen Vàng Sang Trọng -->
+              <label class="cursor-pointer border border-slate-700 rounded-xl p-2.5 flex items-center space-x-2.5 bg-slate-950 hover:border-amber-400 transition has-[:checked]:border-amber-400 has-[:checked]:bg-yellow-950/20">
+                <input type="radio" name="theme-preset" value="luxury" class="text-yellow-500 focus:ring-yellow-500">
+                <div class="w-5 h-5 rounded-full bg-gradient-to-r from-slate-900 via-zinc-800 to-amber-600 border border-amber-400/40 shrink-0"></div>
+                <span class="font-medium text-slate-200 text-[11px]">Đen Vàng Luxury</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 7. Additional Toggles -->
+          <div class="pt-2 border-t border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-300">Hiệu ứng lấp lánh (Sparkles)</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="toggle-sparkles" checked class="sr-only peer">
+                <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+              </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-300">Hiển thị Tem "Thiết kế bởi Klyro"</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="toggle-watermark" checked class="sr-only peer">
+                <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+              </label>
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Live Preview & Export Toolbar (Lg: col-span-7) -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Live Preview Header & Badge -->
+        <div class="bg-slate-900/90 backdrop-blur-sm p-4 md:p-6 rounded-2xl border border-slate-800 shadow-xl space-y-5">
+          
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              </span>
+              <h2 class="text-base font-bold text-slate-100">Khu Vực Xem Trước (Live Preview)</h2>
+            </div>
+            <span class="text-[11px] font-mono bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Format: Ticket Voucher 2.0</span>
+          </div>
+
+          <!-- THE VOUCHER CARD CANVAS PREVIEW WRAPPER -->
+          <div class="flex justify-center items-center py-4 bg-slate-950/60 rounded-xl p-2 sm:p-4 border border-slate-800/80 overflow-x-auto">
+            
+            <!-- VOUCHER TICKET ITEM (Target for html2canvas) -->
+            <div id="voucher-card-container" class="ticket-container relative w-full max-w-[620px] rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 shimmer-effect select-none bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white">
+              
+              <!-- Left Edge Notch Indent -->
+              <div class="ticket-notch-left"></div>
+              <!-- Right Edge Notch Indent -->
+              <div class="ticket-notch-right"></div>
+
+              <!-- Main inner flex layout -->
+              <div class="flex flex-col sm:flex-row items-stretch min-h-[220px]">
+                
+                <!-- MAIN LEFT STUB SECTION -->
+                <div class="flex-1 p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden">
+                  
+                  <!-- Background sparkles decorative vector -->
+                  <div id="preview-sparkles" class="absolute -right-6 -bottom-6 opacity-20 pointer-events-none text-8xl text-white">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  </div>
+
+                  <!-- Header Brand Tag & Limit badge -->
+                  <div class="flex items-center justify-between gap-2 relative z-10 mb-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-md bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-xs">
+                        K
+                      </div>
+                      <span class="text-xs font-extrabold tracking-wider uppercase opacity-95">KLYRO SLIDE DESIGN</span>
+                    </div>
+
+                    <span id="preview-limit-tag" class="px-2.5 py-0.5 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-[10px] font-semibold text-yellow-300">
+                      Chỉ 20 lượt đầu
+                    </span>
+                  </div>
+
+                  <!-- Discount Big Display -->
+                  <div class="relative z-10 my-2">
+                    <p class="text-[11px] font-medium tracking-wide uppercase opacity-80">ƯU ĐÃI NỔI BẬT</p>
+                    <div class="flex items-baseline gap-1 mt-0.5">
+                      <span id="preview-discount-type-prefix" class="text-lg font-bold">GIẢM</span>
+                      <span id="preview-discount-val" class="text-3xl sm:text-4xl font-black tracking-tight drop-shadow-md">50.000đ</span>
+                    </div>
+                    <p id="preview-condition" class="text-xs font-medium text-white/90 mt-1 line-clamp-1">
+                      Áp dụng cho đơn thiết kế slide từ 200.000đ
+                    </p>
+                  </div>
+
+                  <!-- Footer Notes & Expiry -->
+                  <div class="relative z-10 pt-3 border-t border-white/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] opacity-90">
+                    <div class="flex items-center gap-1.5">
+                      <i class="fa-regular fa-clock text-white/80"></i>
+                      <span>HSD: <strong id="preview-expiry">30/12/2026</strong></span>
+                    </div>
+                    <p id="preview-note" class="text-[10px] italic text-white/80 truncate max-w-[200px]">
+                      Áp dụng khi đặt thiết kế PPT/Google Slides tại Klyro Website.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- PERFORATED DASHED DIVIDER LINE -->
+                <div class="dashed-divider hidden sm:block"></div>
+                <div class="h-0.5 border-t-2 border-dashed border-white/30 block sm:hidden my-0"></div>
+
+                <!-- RIGHT CODE & QR STUB SECTION -->
+                <div class="w-full sm:w-48 bg-black/20 backdrop-blur-md p-4 flex flex-col items-center justify-between text-center relative z-10 gap-3">
+                  
+                  <div class="text-center w-full">
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-white/70 block mb-1">MÃ QUÀ TẶNG</span>
+                    
+                    <!-- Code Box + Quick Copy -->
+                    <div class="bg-slate-950/80 border border-white/30 rounded-xl px-2.5 py-1.5 flex items-center justify-between gap-1 group cursor-pointer hover:border-white transition" id="btn-copy-preview-code" title="Bấm để chép mã">
+                      <span id="preview-code-display" class="font-mono font-extrabold text-sm sm:text-base text-yellow-300 tracking-wider truncate">KLYRO50K</span>
+                      <button type="button" class="text-white/70 group-hover:text-white transition text-xs p-1">
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- QR Code simulated preview -->
+                  <div class="bg-white p-1.5 rounded-xl shadow-md border border-white/40 flex flex-col items-center justify-center">
+                    <img id="preview-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://ww.klyro.gt.tc/index-main.html" alt="QR Code" class="w-20 h-20 sm:w-22 sm:h-22 object-contain rounded-md">
+                    <span class="text-[8px] font-bold text-slate-800 tracking-tighter mt-0.5">QUÉT MÃ ĐẶT SLIDE</span>
+                  </div>
+
+                  <!-- Watermark / Footer Badge -->
+                  <div id="preview-watermark-badge" class="w-full text-center">
+                    <a href="https://ww.klyro.gt.tc/index-main.html" target="_blank" class="inline-flex items-center gap-1 text-[9px] text-white/90 font-medium hover:underline bg-white/10 px-2 py-0.5 rounded-full border border-white/20">
+                      <span>Thiết kế bởi Klyro</span>
+                      <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i>
+                    </a>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- EXPORT TOOLBAR BUTTONS -->
+          <div class="space-y-3 pt-2">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tùy Chọn Xuất & Chia Sẻ</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              
+              <!-- Download PNG -->
+              <button type="button" id="btn-download-png" class="w-full py-2.5 px-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-download"></i>
+                <span>Tải Ảnh Thẻ (PNG)</span>
+              </button>
+
+              <!-- Copy HTML Embed -->
+              <button type="button" id="btn-copy-html" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-code text-purple-400"></i>
+                <span>Copy HTML Nhúng</span>
+              </button>
+
+              <!-- Save to LocalStorage list -->
+              <button type="button" id="btn-save-list" class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition active:scale-95">
+                <i class="fa-solid fa-bookmark"></i>
+                <span>Lưu Vào Danh Sách</span>
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RECENTLY CREATED VOUCHERS LIST (LocalStorage Manager) -->
+        <div class="bg-slate-900/90 backdrop-blur-sm p-4 md:p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-purple-400"></i>
+              Danh Sách Mã Giảm Giá Đã Tạo
+            </h3>
+            <button id="btn-clear-history" type="button" class="text-xs text-rose-400 hover:text-rose-300 transition hidden">
+              Xóa tất cả
+            </button>
+          </div>
+
+          <!-- Table / Cards list -->
+          <div id="saved-vouchers-container" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+            <div id="empty-history-msg" class="text-center py-6 text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl">
+              Chưa có mã giảm giá nào được lưu. Bấm "Lưu Vào Danh Sách" để lưu phiên làm việc!
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+      <div class="flex items-center space-x-2">
+        <span class="font-bold text-slate-400">Klyro Slide Studio</span>
+        <span>&copy; 2026 - Công cụ tạo Voucher chuyên nghiệp</span>
+      </div>
+      <a href="https://ww.klyro.gt.tc/index-main.html" target="_blank" class="hover:text-purple-400 transition flex items-center gap-1">
+        <span>https://ww.klyro.gt.tc/index-main.html</span>
+        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+      </a>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Popup -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 bg-slate-900 border border-purple-500/40 text-slate-100 px-4 py-3 rounded-xl shadow-2xl">
+    <div id="toast-icon" class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <div>
+      <h4 id="toast-title" class="text-xs font-bold text-white">Thông báo</h4>
+      <p id="toast-message" class="text-[11px] text-slate-300">Đã thực hiện thành công!</p>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // State Object
+    const defaultState = {
+      code: 'KLYRO50K',
+      discountType: 'fixed', // 'fixed' or 'percent'
+      discountVal: '50.000',
+      condition: 'Áp dụng cho đơn thiết kế slide từ 200.000đ',
+      expiry: '30/12/2026',
+      limit: 'Chỉ 20 lượt đầu',
+      note: 'Áp dụng khi đặt thiết kế PPT/Google Slides tại Klyro Website.',
+      theme: 'klyro', // 'klyro', 'sunset', 'emerald', 'luxury'
+      sparkles: true,
+      watermark: true
+    };
+
+    let state = { ...defaultState };
+
+    // DOM Elements
+    const inputCode = document.getElementById('input-code');
+    const selectType = document.getElementById('select-type');
+    const inputValue = document.getElementById('input-value');
+    const inputCondition = document.getElementById('input-condition');
+    const inputExpiry = document.getElementById('input-expiry');
+    const inputLimit = document.getElementById('input-limit');
+    const inputNote = document.getElementById('input-note');
+    const toggleSparkles = document.getElementById('toggle-sparkles');
+    const toggleWatermark = document.getElementById('toggle-watermark');
+    const themeRadios = document.querySelectorAll('input[name="theme-preset"]');
+
+    // Preview DOM elements
+    const voucherContainer = document.getElementById('voucher-card-container');
+    const previewCodeDisplay = document.getElementById('preview-code-display');
+    const previewDiscountPrefix = document.getElementById('preview-discount-type-prefix');
+    const previewDiscountVal = document.getElementById('preview-discount-val');
+    const previewCondition = document.getElementById('preview-condition');
+    const previewExpiry = document.getElementById('preview-expiry');
+    const previewLimitTag = document.getElementById('preview-limit-tag');
+    const previewNote = document.getElementById('preview-note');
+    const previewSparkles = document.getElementById('preview-sparkles');
+    const previewWatermarkBadge = document.getElementById('preview-watermark-badge');
+    const previewQrImg = document.getElementById('preview-qr-img');
+
+    // Action Buttons
+    const btnRandomCode = document.getElementById('btn-random-code');
+    const btnResetForm = document.getElementById('btn-reset-form');
+    const btnCopyPreviewCode = document.getElementById('btn-copy-preview-code');
+    const btnDownloadPng = document.getElementById('btn-download-png');
+    const btnCopyHtml = document.getElementById('btn-copy-html');
+    const btnSaveList = document.getElementById('btn-save-list');
+    const btnClearHistory = document.getElementById('btn-clear-history');
+    const savedContainer = document.getElementById('saved-vouchers-container');
+    const emptyHistoryMsg = document.getElementById('empty-history-msg');
+
+    // Theme Class Map
+    const themeClasses = {
+      klyro: 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white',
+      sunset: 'bg-gradient-to-r from-amber-500 via-orange-600 to-rose-600 text-white',
+      emerald: 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-500 text-white',
+      luxury: 'bg-gradient-to-r from-slate-950 via-zinc-900 to-amber-950 text-amber-100 border border-amber-500/40'
+    };
+
+    // Random Code Generator Helper
+    const samplePrefixes = ['KLYRO', 'SLIDEPRO', 'PRESENT', 'DECK', 'VOUCHER', 'DISCOUNT'];
+    function generateRandomCode() {
+      const prefix = samplePrefixes[Math.floor(Math.random() * samplePrefixes.length)];
+      const number = Math.floor(10 + Math.random() * 90);
+      const isPercent = Math.random() > 0.5;
+      return `${prefix}${number}${isPercent ? 'OFF' : 'K'}`;
+    }
+
+    // Update Live Preview Function
+    function updatePreview() {
+      // 1. Code
+      state.code = (inputCode.value || 'KLYRO50K').toUpperCase();
+      previewCodeDisplay.textContent = state.code;
+      
+      // Update QR Code API URL
+      const qrData = encodeURIComponent(`https://ww.klyro.gt.tc/index-main.html?giftcode=${state.code}`);
+      previewQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrData}`;
+
+      // 2. Type & Value
+      state.discountType = selectType.value;
+      state.discountVal = inputValue.value || '0';
+
+      if (state.discountType === 'percent') {
+        previewDiscountPrefix.textContent = 'GIẢM';
+        let cleanVal = state.discountVal.replace(/[^0-9]/g, '');
+        previewDiscountVal.textContent = (cleanVal || '20') + '%';
+      } else {
+        previewDiscountPrefix.textContent = 'GIẢM';
+        let valText = state.discountVal.trim();
+        if (!valText.toLowerCase().includes('đ') && !valText.toLowerCase().includes('k')) {
+          valText += 'đ';
+        }
+        previewDiscountVal.textContent = valText;
+      }
+
+      // 3. Condition
+      state.condition = inputCondition.value || 'Áp dụng cho mọi dịch vụ';
+      previewCondition.textContent = state.condition;
+
+      // 4. Expiry
+      state.expiry = inputExpiry.value || 'Không giới hạn';
+      previewExpiry.textContent = state.expiry;
+
+      // 5. Limit Tag
+      state.limit = inputLimit.value || '';
+      if (state.limit.trim()) {
+        previewLimitTag.textContent = state.limit;
+        previewLimitTag.classList.remove('hidden');
+      } else {
+        previewLimitTag.classList.add('hidden');
+      }
+
+      // 6. Note
+      state.note = inputNote.value || '';
+      previewNote.textContent = state.note;
+
+      // 7. Theme Gradient
+      const selectedTheme = document.querySelector('input[name="theme-preset"]:checked')?.value || 'klyro';
+      state.theme = selectedTheme;
+      
+      // Remove all theme classes and apply current
+      Object.values(themeClasses).forEach(cls => {
+        cls.split(' ').forEach(c => voucherContainer.classList.remove(c));
+      });
+      themeClasses[selectedTheme].split(' ').forEach(c => voucherContainer.classList.add(c));
+
+      // 8. Toggles
+      state.sparkles = toggleSparkles.checked;
+      if (state.sparkles) {
+        previewSparkles.classList.remove('hidden');
+        voucherContainer.classList.add('shimmer-effect');
+      } else {
+        previewSparkles.classList.add('hidden');
+        voucherContainer.classList.remove('shimmer-effect');
+      }
+
+      state.watermark = toggleWatermark.checked;
+      if (state.watermark) {
+        previewWatermarkBadge.classList.remove('hidden');
+      } else {
+        previewWatermarkBadge.classList.add('hidden');
+      }
+    }
+
+    // Attach Event Listeners to Inputs
+    [inputCode, inputValue, inputCondition, inputExpiry, inputLimit, inputNote].forEach(el => {
+      el.addEventListener('input', updatePreview);
+    });
+
+    selectType.addEventListener('change', () => {
+      if (selectType.value === 'percent' && (inputValue.value.includes('000') || inputValue.value.includes('.'))) {
+        inputValue.value = '20';
+      } else if (selectType.value === 'fixed' && !inputValue.value.includes('000')) {
+        inputValue.value = '50.000';
+      }
+      updatePreview();
+    });
+
+    themeRadios.forEach(r => r.addEventListener('change', updatePreview));
+    toggleSparkles.addEventListener('change', updatePreview);
+    toggleWatermark.addEventListener('change', updatePreview);
+
+    // Random Code Click
+    btnRandomCode.addEventListener('click', () => {
+      inputCode.value = generateRandomCode();
+      updatePreview();
+      showToast('Đã tạo mã ngẫu nhiên!', 'fa-dice');
+    });
+
+    // Reset Form Click
+    btnResetForm.addEventListener('click', () => {
+      inputCode.value = defaultState.code;
+      selectType.value = defaultState.discountType;
+      inputValue.value = defaultState.discountVal;
+      inputCondition.value = defaultState.condition;
+      inputExpiry.value = defaultState.expiry;
+      inputLimit.value = defaultState.limit;
+      inputNote.value = defaultState.note;
+      toggleSparkles.checked = defaultState.sparkles;
+      toggleWatermark.checked = defaultState.watermark;
+      document.querySelector(`input[name="theme-preset"][value="${defaultState.theme}"]`).checked = true;
+      updatePreview();
+      showToast('Đã khôi phục cài đặt mặc định');
+    });
+
+    // Clipboard Copy Helper
+    function copyToClipboard(text, successMsg) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(successMsg, 'fa-copy');
+        }).catch(() => fallbackCopy(text, successMsg));
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    }
+
+    function fallbackCopy(text, successMsg) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg, 'fa-copy');
+      } catch (err) {
+        showToast('Không thể sao chép tự động', 'fa-triangle-exclamation');
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // Copy Code Click
+    btnCopyPreviewCode.addEventListener('click', () => {
+      copyToClipboard(state.code, `Đã chép mã giftcode: ${state.code}`);
+      confetti({ particleCount: 35, spread: 60, origin: { y: 0.7 } });
+    });
+
+    // Toast Notification System
+    function showToast(message, iconClass = 'fa-check') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.textContent = message;
+      toastIcon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // 1. Download Card as PNG Image (using html2canvas)
+    btnDownloadPng.addEventListener('click', () => {
+      showToast('Đang tạo ảnh PNG chất lượng cao...', 'fa-spinner animate-spin');
+      
+      // Temporarily expand/clean up styles if needed for render
+      html2canvas(voucherContainer, {
+        scale: 3, // High DPI render
+        useCORS: true,
+        backgroundColor: null,
+        logging: false
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Voucher-Klyro-${state.code}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+        showToast('Đã tải ảnh Voucher thành công!', 'fa-file-image');
+      }).catch(err => {
+        console.error(err);
+        showToast('Có lỗi khi tạo ảnh PNG', 'fa-circle-xmark');
+      });
+    });
+
+    // 2. Generate and Copy Embeddable HTML Snippet
+    btnCopyHtml.addEventListener('click', () => {
+      const currentThemeClass = themeClasses[state.theme];
+      const limitBadgeHtml = state.limit ? `<span style="background:rgba(0,0,0,0.4);color:#FDE047;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:bold;">${state.limit}</span>` : '';
+      const watermarkHtml = state.watermark ? `<a href="https://ww.klyro.gt.tc/index-main.html" target="_blank" style="color:rgba(255,255,255,0.9);font-size:9px;text-decoration:none;">Thiết kế bởi Klyro ↗</a>` : '';
+      
+      const htmlSnippet = `<!-- Klyro Voucher Embed Code -->
+<div style="max-w:560px;margin:15px auto;border-radius:16px;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 10px 25px -5px rgba(0,0,0,0.3);position:relative;">
+  <div class="${currentThemeClass}" style="display:flex;flex-wrap:wrap;min-height:180px;padding:16px;gap:12px;align-items:center;">
+    <div style="flex:1;min-width:220px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-weight:800;font-size:12px;letter-spacing:1px;">KLYRO SLIDE DESIGN</span>
+        ${limitBadgeHtml}
+      </div>
+      <div style="margin:8px 0;">
+        <span style="font-size:10px;opacity:0.8;display:block;">ƯU ĐÃI NỔI BẬT</span>
+        <strong style="font-size:28px;font-weight:900;">${previewDiscountPrefix.textContent} ${previewDiscountVal.textContent}</strong>
+        <p style="font-size:11px;margin-top:4px;opacity:0.9;">${state.condition}</p>
+      </div>
+      <div style="font-size:10px;opacity:0.8;border-top:1px solid rgba(255,255,255,0.2);padding-top:6px;margin-top:6px;">
+        HSD: <strong>${state.expiry}</strong> | ${state.note}
+      </div>
+    </div>
+    <div style="background:rgba(0,0,0,0.25);border-radius:12px;padding:12px;text-align:center;min-width:140px;display:flex;flex-direction:column;align-items:center;gap:6px;">
+      <span style="font-size:9px;letter-spacing:1px;opacity:0.7;">MÃ GIẢM GIÁ</span>
+      <div style="background:#0F172A;color:#FDE047;padding:6px 10px;border-radius:8px;font-family:monospace;font-weight:bold;font-size:14px;letter-spacing:1px;">${state.code}</div>
+      ${watermarkHtml}
+    </div>
+  </div>
+</div>`;
+
+      copyToClipboard(htmlSnippet, 'Đã sao chép mã HTML nhúng!');
+    });
+
+    // 3. LocalStorage History Management
+    const LOCAL_STORAGE_KEY = 'klyro_vouchers_history';
+
+    function getSavedVouchers() {
+      try {
+        return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveVoucherToHistory() {
+      const list = getSavedVouchers();
+      const newItem = {
+        id: Date.now(),
+        ...state,
+        createdAt: new Date().toLocaleDateString('vi-VN')
+      };
+      
+      // Unshift to top & limit max 15 entries
+      list.unshift(newItem);
+      if (list.length > 15) list.pop();
+
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
+      renderHistoryList();
+      showToast(`Đã lưu mã ${state.code} vào danh sách!`, 'fa-bookmark');
+      confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+    }
+
+    function renderHistoryList() {
+      const list = getSavedVouchers();
+      if (list.length === 0) {
+        emptyHistoryMsg.classList.remove('hidden');
+        btnClearHistory.classList.add('hidden');
+        savedContainer.innerHTML = '';
+        savedContainer.appendChild(emptyHistoryMsg);
+        return;
+      }
+
+      emptyHistoryMsg.classList.add('hidden');
+      btnClearHistory.classList.remove('hidden');
+      savedContainer.innerHTML = '';
+
+      list.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'bg-slate-950/80 border border-slate-800 hover:border-slate-700 p-3 rounded-xl flex items-center justify-between gap-3 text-xs transition';
+        
+        itemEl.innerHTML = `
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+              <i class="fa-solid fa-ticket"></i>
+            </div>
+            <div class="truncate">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-bold text-yellow-300 text-sm truncate">${item.code}</span>
+                <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-semibold">${item.discountType === 'percent' ? item.discountVal + '%' : item.discountVal}</span>
+              </div>
+              <p class="text-[11px] text-slate-400 truncate mt-0.5">${item.condition} - HSD: ${item.expiry}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" onclick="loadSavedVoucher(${item.id})" class="px-2.5 py-1 bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-500/30 rounded-lg text-[11px] font-semibold transition" title="Nạp mã này lên form">
+              <i class="fa-solid fa-upload"></i> Nạp
+            </button>
+            <button type="button" onclick="deleteSavedVoucher(${item.id})" class="p-1.5 text-slate-500 hover:text-rose-400 transition" title="Xóa">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+        savedContainer.appendChild(itemEl);
+      });
+    }
+
+    // Load saved item back into controls
+    window.loadSavedVoucher = function(id) {
+      const list = getSavedVouchers();
+      const target = list.find(x => x.id === id);
+      if (!target) return;
+
+      inputCode.value = target.code;
+      selectType.value = target.discountType;
+      inputValue.value = target.discountVal;
+      inputCondition.value = target.condition;
+      inputExpiry.value = target.expiry;
+      inputLimit.value = target.limit;
+      inputNote.value = target.note;
+      toggleSparkles.checked = target.sparkles;
+      toggleWatermark.checked = target.watermark;
+      
+      const themeRadio = document.querySelector(`input[name="theme-preset"][value="${target.theme}"]`);
+      if (themeRadio) themeRadio.checked = true;
+
+      updatePreview();
+      showToast(`Đã nạp mã ${target.code} vào form!`, 'fa-arrow-rotate-right');
+    };
+
+    // Delete saved item
+    window.deleteSavedVoucher = function(id) {
+      let list = getSavedVouchers();
+      list = list.filter(x => x.id !== id);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
+      renderHistoryList();
+      showToast('Đã xóa mã khỏi danh sách');
+    };
+
+    // Clear all history
+    btnClearHistory.addEventListener('click', () => {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      renderHistoryList();
+      showToast('Đã xóa toàn bộ lịch sử!');
+    });
+
+    btnSaveList.addEventListener('click', saveVoucherToHistory);
+
+    // Initial Setup
+    window.addEventListener('DOMContentLoaded', () => {
+      updatePreview();
+      renderHistoryList();
+    });
+  </script>
+</body>
+</html>
